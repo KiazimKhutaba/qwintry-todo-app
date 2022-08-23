@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('todo_items', function (Blueprint $table) {
             $table->id();
             $table->string('text')->nullable(false);
-            $table->boolean('is_done')->nullable(false)->default(false);
-            $table->boolean('is_urgent')->nullable(false)->default(false);
+            $table->boolean('is_done')->nullable(true)->default(false);
+            $table->boolean('is_urgent')->nullable(true)->default(false);
             $table->timestamps();
         });
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TodoItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,4 +19,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('/todo/item', \App\Http\Controllers\TodoItemController::class);
+Route::get('/todos', [TodoItemController::class, 'index']);
+Route::post('/todos', [TodoItemController::class, 'store']);
+
+Route::put('/todos/{id}', [TodoItemController::class, 'changeStatus']);
+
+//Route::apiResource('/todos', \App\Http\Controllers\TodoItemController::class);
