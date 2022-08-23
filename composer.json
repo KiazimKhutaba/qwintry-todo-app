@@ -41,7 +41,8 @@
             "@php -r \"file_exists('.env') || copy('.env.heroku', '.env');\"",
             "@php artisan key:generate --ansi",
             "@php artisan migrate",
-            "@php artisan db:seed"
+            "@php artisan db:seed",
+            "@npm run build"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
