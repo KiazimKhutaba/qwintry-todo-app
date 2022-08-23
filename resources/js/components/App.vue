@@ -6,19 +6,26 @@
 
     <div class="container mt-4">
         <div class="row">
+
             <!-- Simple todos -->
-            <div class="col py-3" style="border: 1px solid #ddd">
+            <div class="col-md-6 py-3" style="border: 1px solid #ddd">
 
                 <p>Todos ({{ simpleTodos.length }})</p>
 
-                <ul v-for="todo in simpleTodos">
+                <ul>
                     <li :id="todo.id"
                         :key="todo.id"
-                        :class="{ 'text-decoration-line-through': todo['is_done'] }"
-                        @click="onTodoClick"
-                    >
+                        :class="{ 'text-decoration-line-through': todo['is_done'], 'todo-item__link': true }"
+                        v-for="todo in simpleTodos"
+                        @click="contentVisible === todo.id ? contentVisible = false : contentVisible = todo.id">
+
                         {{ todo.text }}
-                        <span class="text-primary" v-if="showTodoActions && (+clickTargetId === +todo.id)">[done] [remove] [move to urgent]</span>
+
+                        <span class="text-primary" v-show="contentVisible === todo.id">
+                            <span @click="makeTodoCompleted(todo.id)">{{ todo['is_done'] ? '[done]' : '[complete]' }}</span>
+                            <span @click="removeTodo(todo.id)">[remove]</span>
+                            <span @click="moveToUrgent(todo.id)">[move to urgent]</span>
+                        </span>
                     </li>
                 </ul>
 
@@ -26,12 +33,25 @@
             </div>
 
             <!-- Urgent todos -->
-            <div class="col py-3" style="border: 1px solid #ddd">
+            <div class="col-md-6 py-3" style="border: 1px solid #ddd">
 
-                <p>Todos <span :class="{ 'text-danger': urgentTodos.length > 3}">({{  urgentTodos.length }})</span></p>
+                <p>Todos <span :class="{ 'text-danger': urgentTodos.length >= 3}">({{  urgentTodos.length }})</span></p>
 
-                <ul v-for="todo in urgentTodos">
-                    <li :key="todo.id" :class="{ 'text-decoration-line-through': todo['is_done'] }">{{ todo.text }}</li>
+                <ul>
+                    <li :id="todo.id"
+                        :key="todo.id"
+                        :class="{ 'text-decoration-line-through': todo['is_done'], 'todo-item__link': true }"
+                        v-for="todo in urgentTodos"
+                        @click="contentVisible === todo.id ? contentVisible = false : contentVisible = todo.id">
+
+                        {{ todo.text }}
+
+                        <span class="text-primary" v-show="contentVisible === todo.id">
+                            <span @click="makeTodoCompleted(todo.id)">{{ todo['is_done'] ? '[done]' : '[complete]' }}</span>
+                            <span @click="removeTodo(todo.id)">[remove]</span>
+                            <span @click="moveToUrgent(todo.id)">[move to simple]</span>
+                        </span>
+                    </li>
                 </ul>
             </div>
 
@@ -42,6 +62,7 @@
 <script>
 
 import {getAllTodos} from '../services/TodoService'
+import {uniqueId} from '../utils'
 
 export default {
     name: "App",
@@ -49,14 +70,17 @@ export default {
     data() {
         return {
             allTodos: [],
-            showTodoActions: false,
+            contentVisible: false,
             clickTargetId: 0,
-            nextTodoId: -1
+            nextTodoId: 0
         }
     },
 
     mounted() {
         this.getAllTodos()
+
+        // Todo: changed needed
+        //this.nextTodoId = this.allTodos.length + 1
     },
 
     computed: {
@@ -72,27 +96,52 @@ export default {
 
     methods: {
 
-        getAllTodos() {
+        getAllTodos()
+        {
             getAllTodos().then(todos => {
                 this.allTodos = todos
             })
         },
 
-        removeTodo(id) {
+        removeTodo(id)
+        {
             this.allTodos = this.allTodos.filter(todo => todo.id !== id)
         },
 
-        addTodo(e) {
+
+        addTodo(e)
+        {
             // return if value is empty
             if(e.target.value.trim().length === 0)
                 return false;
 
-            this.allTodos.push({ id: this.nextTodoId, text: e.target.value, is_done: 1, is_urgent: 1 })
+            this.allTodos.push({ id: uniqueId(), text: e.target.value, is_done: 0, is_urgent: 0 })
+            e.target.value = "";
         },
 
-        onTodoClick(e) {
-            this.clickTargetId = e.target.id
-            this.showTodoActions = !this.showTodoActions
+
+        makeTodoCompleted(id)
+        {
+            this.allTodos = this.allTodos.map(todo => {
+
+                if(+todo.id === +id) {
+                    todo.is_done = todo.is_done ? 0 : 1;
+                }
+
+                return todo;
+            });
+        },
+
+        moveToUrgent(id)
+        {
+            this.allTodos = this.allTodos.map(todo => {
+
+                if(+todo.id === +id) {
+                    todo.is_urgent = todo.is_urgent ? 0 : 1;
+                }
+
+                return todo;
+            });
         }
     }
 }
@@ -100,4 +149,17 @@ export default {
 
 <style scoped>
 
+    .todo-item__link {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .todo-item__link .text-primary {
+        position: absolute;
+        padding-left: 10px;
+    }
+
+    .todo-item__link:hover {
+        text-decoration: underline;
+    }
 </style>
