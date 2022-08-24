@@ -115,7 +115,7 @@ export default {
             if(e.target.value.trim().length === 0)
                 return false;
 
-            this.allTodos.push({ id: uniqueId(), text: e.target.value, is_done: 0, is_urgent: 0 })
+            this.allTodos.push({ id: Date.now(), text: e.target.value, is_done: 0, is_urgent: 0 })
             e.target.value = "";
         },
 

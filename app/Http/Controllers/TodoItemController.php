@@ -7,6 +7,8 @@ use App\Models\TodoItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Nette\NotImplementedException;
 
@@ -24,19 +26,44 @@ class TodoItemController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * Todo: this action does too many things - should be refactored!
      *
      * @param TodoItemFormRequest $request
      * @return JsonResponse
      */
-    public function store(TodoItemFormRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $attributes = $request->only(['text', 'is_done', 'is_urgent']);
-        //$validated = $attributes->safe()->only(['text', 'is_done', 'is_urgent']);
-
-        //$todo = TodoItem::create($validated);
+        $todo = $request->input('todo');
+        $responseStatus = 200;
 
 
-        return \response()->json($attributes);
+        if(!$todo)
+            return \response()->json(['status_code' => 400, 'message' => 'Required parameter \'todo\' missing in request'], 400);
+
+        $rules = [
+            'text' => 'required|string|between:3,100',  //Must be a number and length of value is 8
+            'is_done' => 'required|in:0,1',
+            'is_urgent' => 'required|in:0,1',
+        ];
+
+        $messages = [
+            'in' => 'Field :attribute should be :values'
+        ];
+
+        $validator = Validator::make($todo, $rules, $messages);
+
+        if ($validator->passes())
+        {
+            $createdTodo = TodoItem::create($validator->valid());
+            $responseData = ['message' => 'Todo created', 'todo' => $createdTodo];
+        }
+        else
+        {
+            $responseData = ['status_code' => 400, 'message' => $validator->messages()];
+            $responseStatus = 400;
+        }
+
+        return \response()->json($responseData, $responseStatus);
     }
 
     /**
@@ -47,7 +74,7 @@ class TodoItemController extends Controller
      */
     public function show($id)
     {
-        //
+        throw new NotImplementedException();
     }
 
 
