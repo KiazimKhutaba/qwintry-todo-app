@@ -38,7 +38,7 @@ export async function toggleTodoCompleteStatus(todoId, status)
 
 export async function toggleTodoUrgentStatus(todoId, status)
 {
-    return await request(`/api/todos/${todoId}`, { todo: { id: todoId, is_done: status } } , 'PUT')
+    return await request(`/api/todos/${todoId}`, { todo: { id: todoId, is_urgent: status } } , 'PUT')
 }
 
 

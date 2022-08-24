@@ -70,6 +70,7 @@ class TodoItemController extends Controller
 
     public function changeStatus(Request $request, int $id): JsonResponse
     {
+        $responseStatus = 200;
         $todo = $request->input('todo');
 
         if(!$todo)
@@ -88,21 +89,24 @@ class TodoItemController extends Controller
         $validator = Validator::make($todo, $rules, $messages);
 
 
-        return \response()->json(['valid' => $validator->valid(), 'error' => $validator->messages()]);
+        if ($validator->passes())
+        {
+            $todoItem = TodoItem::find($id);
+
+            if(!$todoItem)
+                return \response()->json(['status_code' => 404, 'message' => 'Can\'t find todo with id: ' . $id], 404);
 
 
-        $urgentStatus = $request->input('status');
-        $doneStatus = $request->input('is_done');
+            $updatedTodo = $todoItem->update($validator->valid());
+            $responseData = ['message' => 'Todo updated', 'todo' => $validator->valid()];
+        }
+        else
+        {
+            $responseData = ['status_code' => 400, 'message' => $validator->messages()];
+            $responseStatus = 400;
+        }
 
-        $todoItem = TodoItem::findOrFail($id);
-        $todoItem->is_urgent = intval($urgentStatus);
-        $todoItem->is_done = intval($doneStatus);
-
-        $savedTodo = $todoItem->save();
-
-        return \response()->json([
-            'data' => ['code' => $savedTodo, 'is_urgent' => $urgentStatus, 'done' => $doneStatus]
-        ]);
+        return \response()->json($responseData, $responseStatus);
     }
 
     /**

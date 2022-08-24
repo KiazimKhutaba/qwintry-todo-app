@@ -131,6 +131,7 @@ export default {
 
                 if(+todo.id === +id) {
                     todo.is_done = todo.is_done ? 0 : 1;
+                    toggleTodoCompleteStatus(todo.id, todo.is_done)
                 }
 
                 return todo;
