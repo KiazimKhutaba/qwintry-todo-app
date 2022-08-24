@@ -93,7 +93,7 @@ export default {
         getAllTodos()
         {
             getAllTodos().then(todos => {
-                this.allTodos = todos
+                this.allTodos.push(todos)
             });
         },
 
