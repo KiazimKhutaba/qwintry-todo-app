@@ -69,17 +69,12 @@ export default {
     data() {
         return {
             allTodos: [],
-            contentVisible: false,
-            clickTargetId: 0,
-            nextTodoId: 0
+            contentVisible: false
         }
     },
 
     mounted() {
         this.getAllTodos()
-
-        // Todo: changed needed
-        //this.nextTodoId = this.allTodos.length + 1
     },
 
     computed: {
@@ -99,7 +94,7 @@ export default {
         {
             getAllTodos().then(todos => {
                 this.allTodos = todos
-            })
+            });
         },
 
         removeTodo(id)
