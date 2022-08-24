@@ -74,34 +74,45 @@ export default {
     },
 
     mounted() {
-        this.getAllTodos()
+        this.getAllTodos();
     },
 
     computed: {
 
         simpleTodos() {
-            return this.allTodos.filter(todo => todo['is_urgent'] === 0)
+            return this.allTodos.filter(todo => todo['is_urgent'] === 0);
         },
 
         urgentTodos() {
-            return this.allTodos.filter(todo => todo['is_urgent'] === 1)
+            return this.allTodos.filter(todo => todo['is_urgent'] === 1);
         }
     },
 
     methods: {
 
+        createTodoTest()
+        {
+            return { id: Date.now(), text: 'Some text for todo', is_done: 0, is_urgent: 0 }
+        },
+
         getAllTodos()
         {
-            getAllTodos().then(todos => {
-                this.allTodos.push(todos)
-            });
+            getAllTodos()
+                .then(todos => {
+                    console.log(todos)
+                    this.allTodos = todos
+                })
+                .catch(err => {
+                   alert('Error happened while fetching todos!');
+                   console.error(err)
+                });
         },
 
         removeTodo(id)
         {
-            this.allTodos = this.allTodos.filter(todo => todo.id !== id)
+            this.allTodos = this.allTodos.filter(todo => todo.id !== id);
 
-            removeTodo(id).then(console.log)
+            removeTodo(id).then(console.log);
         },
 
 

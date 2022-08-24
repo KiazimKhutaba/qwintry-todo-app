@@ -33,6 +33,10 @@ class TodoItem extends Model
       'text', 'is_done', 'is_urgent'
     ];
 
+    protected $casts = [
+        'is_done' => 'integer',
+        'is_urgent' => 'integer'
+    ];
 
     public function isUrgent(bool $status)
     {
