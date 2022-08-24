@@ -75,6 +75,8 @@ export default {
 
     mounted() {
         this.getAllTodos()
+
+        alert('App mounted')
     },
 
     computed: {
