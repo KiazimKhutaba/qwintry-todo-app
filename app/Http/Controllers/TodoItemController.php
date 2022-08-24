@@ -66,48 +66,32 @@ class TodoItemController extends Controller
         return \response()->json($responseData, $responseStatus);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
+
+
+    public function changeStatus(Request $request, int $id): JsonResponse
     {
-        throw new NotImplementedException();
-    }
+        $todo = $request->input('todo');
+
+        if(!$todo)
+            return \response()->json(['status_code' => 400, 'message' => 'Required parameter \'todo\' missing in request'], 400);
+
+        $rules = [
+            'id' => 'required|integer',
+            'is_done' => 'prohibited_unless:is_urgent,null|required_without:is_urgent|in:0,1',
+            'is_urgent' => 'prohibited_unless:is_done,null|required_without:is_done|in:0,1',
+        ];
+
+        $messages = [
+            'in' => 'Field :attribute should be :values'
+        ];
+
+        $validator = Validator::make($todo, $rules, $messages);
 
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        throw new NotImplementedException();
-    }
+        return \response()->json(['valid' => $validator->valid(), 'error' => $validator->messages()]);
 
 
-    public function changeUrgentStatus(Request $request, int $id = 1): JsonResponse
-    {
-        $urgentStatus = $request->input('urgent');
-
-        $todoItem = TodoItem::findOrFail($id);
-        $todoItem->is_urgent = intval($urgentStatus);
-        $savedTodo = $todoItem->save();
-
-        return \response()->json([
-            'data' => ['code' => $savedTodo, 'is_urgent' => $urgentStatus]
-        ]);
-    }
-
-
-    public function changeStatus(Request $request, int $id = 1): JsonResponse
-    {
-        $urgentStatus = $request->input('is_urgent');
+        $urgentStatus = $request->input('status');
         $doneStatus = $request->input('is_done');
 
         $todoItem = TodoItem::findOrFail($id);

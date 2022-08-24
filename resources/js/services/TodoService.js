@@ -27,23 +27,18 @@ export async function createTodo(todo)
 /**
  *
  * @param todoId {int}
- * @param status {boolean}
+ * @param status {int}
  * @returns {Promise<any>}
  */
 export async function toggleTodoCompleteStatus(todoId, status)
 {
-    return await request(`/api/todos/${todoId}`, { status })
+    return await request(`/api/todos/${todoId}`, { todo: { id: todoId, is_done: status } }, 'PUT' )
 }
 
-/**
- *
- * @param todoId {int}
- * @param status {boolean}
- * @returns {Promise<any>}
- */
+
 export async function toggleTodoUrgentStatus(todoId, status)
 {
-    return await request(`/api/todos/${todoId}`, { status })
+    return await request(`/api/todos/${todoId}`, { todo: { id: todoId, is_done: status } } , 'PUT')
 }
 
 

@@ -61,8 +61,7 @@
 
 <script>
 
-import {getAllTodos} from '../services/TodoService'
-import {uniqueId} from '../utils'
+import {getAllTodos, createTodo, removeTodo, toggleTodoCompleteStatus, toggleTodoUrgentStatus} from '../services/TodoService'
 
 export default {
     name: "App",
@@ -106,6 +105,8 @@ export default {
         removeTodo(id)
         {
             this.allTodos = this.allTodos.filter(todo => todo.id !== id)
+
+            removeTodo(id).then(console.log)
         },
 
 
@@ -115,8 +116,12 @@ export default {
             if(e.target.value.trim().length === 0)
                 return false;
 
-            this.allTodos.push({ id: Date.now(), text: e.target.value, is_done: 0, is_urgent: 0 })
-            e.target.value = "";
+            const clientTodo = { text: e.target.value, is_done: 0, is_urgent: 0 }
+
+            createTodo(clientTodo).then(({ todo }) => {
+                this.allTodos.push(todo);
+                e.target.value = "";
+            });
         },
 
 
@@ -138,6 +143,7 @@ export default {
 
                 if(+todo.id === +id) {
                     todo.is_urgent = todo.is_urgent ? 0 : 1;
+                    toggleTodoUrgentStatus(todo.id, todo.is_urgent)
                 }
 
                 return todo;
